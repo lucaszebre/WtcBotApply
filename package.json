@@ -7,5 +7,8 @@
     "test": "nodemon index"
   },
   "author": "lucaszebre",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.3.1"
+  }
 }
