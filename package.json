@@ -1,0 +1,11 @@
+{
+  "name": "wtcbotapply",
+  "version": "1.0.0",
+  "description": "A bot to apply to spontenaous jobs for me ",
+  "main": "index.js",
+  "scripts": {
+    "test": "nodemon index"
+  },
+  "author": "lucaszebre",
+  "license": "MIT"
+}
