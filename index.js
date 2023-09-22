@@ -19,7 +19,7 @@ const letter=`Madame, Monsieur,
 
 Actuellement en formation autodidacte en développement front-end, je suis déterminé à acquérir une première expérience professionnelle au sein d'une entreprise innovante. Malgré l'absence de diplôme, je tiens à vous assurer que ma passion pour la programmation, mon portefeuille de projets variés et ma maîtrise des technologies telles que JavaScript, React, Node.js et Python attestent de ma compétence et de mon engagement.
 
-Je suis convaincu que votre entreprise, reconnue pour son expertise dans le domaine du développement, serait le lieu idéal pour mettre en pratique mes compétences et en acquérir de nouvelles. Mon portfolio, consultable ici : [Lien vers mon Portfolio](https://lucaszebre.github.io/Portfolio/), reflète mon engagement dans la création de projets innovants et fonctionnels. N'hésitez pas à l'explorer pour mieux appréhender mon travail et ma passion pour la programmation.
+Je suis convaincu que votre entreprise,, serait le lieu idéal pour mettre en pratique mes compétences et en acquérir de nouvelles. Mon portfolio, consultable ici : [Lien vers mon Portfolio](https://lucaszebre.github.io/Portfolio/), reflète mon engagement dans la création de projets innovants et fonctionnels. N'hésitez pas à l'explorer pour mieux appréhender mon travail et ma passion pour la programmation.
 
 Je suis motivé à l'idée de rejoindre une équipe dynamique et de contribuer activement à vos projets. Mon adaptabilité, mon sens de l'organisation et ma rigueur font de moi un candidat capable de s'intégrer rapidement dans votre entreprise. De plus, ma capacité d'apprentissage rapide me permettra de contribuer activement dès le début de mon contrat en alternance.
 
@@ -91,7 +91,7 @@ async function initiliazer() {
   }
 
   async function getAllTheCompany(){
-    let i=0
+    let i=1
     while(i<numberOfPagination){
         await GetCompaniesPage(i)
         i++
@@ -114,7 +114,8 @@ async function initiliazer() {
 
 // function to apply to one companies
 async function ApplyToOneCompanies(companies) {
-    await page.goto(`https://www.welcometothejungle.com/fr/companies/${companies}/jobs`);
+    try {
+        await page.goto(`https://www.welcometothejungle.com/fr/companies/${companies}/jobs`);
     const selector = '#pages_organizations_show > main > div > div > section > div.sc-1tceu7y-0.dtBzLT > div > div > div > div > div > div.sc-1mxdn37-1.gkJZtf > ol > div.sc-bXCLTC.eRgxOS > div > button';
   
     try {
@@ -143,9 +144,15 @@ async function ApplyToOneCompanies(companies) {
       const ConfirmButton = '#apply-form-submit';
       await buttonClick(ConfirmButton);
       await page.waitForTimeout(5000);
+      console.log(`apply ${companies}`)
     } catch (error) {
       console.error('Error during application:', error);
     }
+    console.log('Aply ', companies)
+    } catch (error) {
+        console.log('ErrorApply',companies)
+    }
+    
   }
   
   
@@ -156,6 +163,7 @@ async function ApplyToOneCompanies(companies) {
 
   async function scrapeCompanyNames(companyNameSelector) {
     try {
+        await page.waitForTimeout(2500);
       await page.waitForSelector(companyNameSelector);
       const companyNames = await page.$$eval(companyNameSelector, (elements) => {
         return elements.map((element) => {
@@ -172,12 +180,16 @@ async function ApplyToOneCompanies(companies) {
     }
   }
  
-  async function ApplytoAll(){
+  async function ApplytoAll() {
     await getAllTheCompany();
-    for(const i in ListCompany){
-        console.log(i)
+    console.log(ListCompany);
+  
+    // Loop through each company and apply
+    for (const company of ListCompany) {
+      await ApplyToOneCompanies(company);
     }
   }
+  
   async function main() {
         await initiliazer();
         await Login();
