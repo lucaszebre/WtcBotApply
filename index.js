@@ -45,6 +45,8 @@ async function Login() {
     await findTargetAndType('#email_login', email);
     await findTargetAndType('#password', password);
     page.keyboard.press("Enter");
+    await page.waitForTimeout(3000); // Wait for 3 seconds (adjust as needed)
+
 
 }
 
@@ -91,12 +93,13 @@ async function initiliazer() {
   async function getAllTheCompany(){
     let i=0
     while(i<numberOfPagination){
-        await jobsApply(i)
+        await GetCompaniesPage(i)
         i++
     }
   }
 
- async function jobsApply(i) {
+// function to get list of all the company on the page 'i'
+ async function GetCompaniesPage(i) {
   await page.goto(
     `https://www.welcometothejungle.com/fr/companies?page=${i}&aroundQuery=Paris%2C%20France&aroundLatLng=48.85718%2C2.34141&aroundRadius=20000&query=`
   );
@@ -108,6 +111,8 @@ async function initiliazer() {
   await page.waitForTimeout(500);
 }
 
+
+// function to apply to one companies
 async function ApplyToOneCompanies(companies) {
     await page.goto(`https://www.welcometothejungle.com/fr/companies/${companies}/jobs`);
     const selector = '#pages_organizations_show > main > div > div > section > div.sc-1tceu7y-0.dtBzLT > div > div > div > div > div > div.sc-1mxdn37-1.gkJZtf > ol > div.sc-bXCLTC.eRgxOS > div > button';
@@ -167,13 +172,17 @@ async function ApplyToOneCompanies(companies) {
     }
   }
  
+  async function ApplytoAll(){
+    await getAllTheCompany();
+    for(const i in ListCompany){
+        console.log(i)
+    }
+  }
   async function main() {
         await initiliazer();
         await Login();
-        // await getAllTheCompany();
-        await ApplyToOneCompanies('jab');
-        console.log(ListCompany)
-        await page.waitForTimeout(50044444);
+        await ApplytoAll()
+        await page.waitForTimeout(5004);
 
         await browser.close();
   }
