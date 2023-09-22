@@ -1,4 +1,4 @@
-const puppeteer = require("puppeteer");
+const { chromium } = require('playwright-chromium');
 const dotenv = require("dotenv");
 dotenv.config(); // Load environment variables from .env file
 
@@ -33,6 +33,13 @@ Je vous prie d'agréer, Madame, Monsieur, l'expression de mes salutations distin
 
 Lucas Zebre`
 async function Login() {
+    const popupselector='#axeptio_btn_acceptAll'
+    try {
+      await buttonClick(popupselector);
+      await page.waitForTimeout(3000);
+    } catch (error) {
+      console.error('Error clicking on button:', error);
+    }
     const selector = "[data-testid='header-user-button-login']";
     await buttonClick(selector);
     await findTargetAndType('#email_login', email);
@@ -40,6 +47,8 @@ async function Login() {
     page.keyboard.press("Enter");
 
 }
+
+
 async function findTargetAndType(target, value) {
     await page.waitForSelector(target);
     const f = await page.$(target);
@@ -47,7 +56,7 @@ async function findTargetAndType(target, value) {
   }
 
 async function initiliazer() {
-    browser = await puppeteer.launch({
+    browser = await chromium.launch({
       headless: false,
       executablePath: browserPath,
       args: [resolution],
@@ -57,19 +66,27 @@ async function initiliazer() {
       // and change the baseURL to https://www.linkedin.com/feed
     });
     page = await browser.newPage();
-    const pages = await browser.pages();
-    if (pages.length > 1) {
-      await pages[0].close();
-    }
+   
     await page.goto(BaseURL);
   }
   async function buttonClick(selector) {
-    await page.waitForSelector(selector);
+    await page.waitForSelector(selector,{ visible: true });
     const buttonClick = await page.$(selector);
     await buttonClick.click();
   }
   let ListCompany=[]
 
+  async function interceptCloseModalEvent() {
+    await page.evaluate(() => {
+      // Intercept the click event that closes the modal
+      const closeButton = document.querySelector('.close-button-selector'); // Replace with the actual close button selector
+      if (closeButton) {
+        closeButton.addEventListener('click', (e) => {
+          e.stopPropagation(); // Prevent the click event from closing the modal
+        });
+      }
+    });
+  }
 
   async function getAllTheCompany(){
     let i=0
@@ -88,66 +105,47 @@ async function initiliazer() {
   await buttonClick(selector);
   const companyNames = await scrapeCompanyNames('.sc-bXCLTC.hlqow9-0.helNZg');
   ListCompany.push(...companyNames); // Append the company names to the list
-  await page.waitForTimeout(3000);
+  await page.waitForTimeout(500);
 }
 
 async function ApplyToOneCompanies(companies) {
     await page.goto(`https://www.welcometothejungle.com/fr/companies/${companies}/jobs`);
     const selector = '#pages_organizations_show > main > div > div > section > div.sc-1tceu7y-0.dtBzLT > div > div > div > div > div > div.sc-1mxdn37-1.gkJZtf > ol > div.sc-bXCLTC.eRgxOS > div > button';
-    
-        try {
-        await buttonClick(selector);
-        } catch (error) {
-        console.error('Error clicking on button:', error);
-        }
-    
-        const selectorTextArea = '#cover_letter';
-        await findTargetAndType(selectorTextArea, letter);
-    
-        try {
-        await page.evaluate(() => {
-            window.scrollBy(0, window.innerHeight);
-        });
-        } catch (error) {
-        console.error('Error scrolling:', error);
-        }
-    
-        const firstInput = 'input[type="checkbox"][data-testid="apply-form-terms"]#terms';
-        try {
-        await buttonClick(firstInput);
-        } catch (error) {
-        console.error('Error clicking on terms checkbox:', error);
-        }
-    
-        const secondInput = 'input[type="checkbox"][data-testid="apply-form-consent"]#consent';
-        try {
-        await scrollAndClickCheckboxk(secondInput);
-        } catch (error) {
-        console.error('Error clicking on consent checkbox:', error);
-        }
-    
-        const ConfirmButton = '#apply-form-submit';
-        try {
-        await scrollAndClickCheckbox(ConfirmButton);
-        } catch (error) {
-        console.error('Error clicking on submit button:', error);
-        }
-    
-        await page.waitForTimeout(20000);
+  
+    try {
+      await buttonClick(selector);
+      await page.waitForTimeout(3000);
+    } catch (error) {
+      console.error('Error clicking on button:', error);
     }
     
-    async function scrollAndClickCheckbox(selector) {
-        await page.waitForSelector(selector);
-        const checkbox = await page.$(selector);
-        if (checkbox) {
-          await page.evaluate((element) => {
-            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          }, checkbox);
-          await checkbox.click();
-        } else {
-          console.error(`Element with selector "${selector}" not found.`);
-        }
-      }
+  
+    const selectorTextArea = '#cover_letter';
+  
+    try {
+      await findTargetAndType(selectorTextArea, letter);
+      await buttonClick('#terms');
+      await buttonClick('#consent');
+      // Scroll and wait for a moment (adjust the duration as needed)
+      await page.evaluate(() => {
+        window.scrollBy(0, 200); // Scroll down by 200 pixels (adjust as needed)
+      });
+      await page.waitForTimeout(3000); // Wait for 3 seconds (adjust as needed)
+      
+      // Explicitly wait for the submit button to appear
+      await page.waitForSelector('#apply-form-submit', { visible: true });
+      
+      const ConfirmButton = '#apply-form-submit';
+      await buttonClick(ConfirmButton);
+      await page.waitForTimeout(5000);
+    } catch (error) {
+      console.error('Error during application:', error);
+    }
+  }
+  
+  
+  
+  
 
 
 
@@ -175,6 +173,8 @@ async function ApplyToOneCompanies(companies) {
         // await getAllTheCompany();
         await ApplyToOneCompanies('jab');
         console.log(ListCompany)
+        await page.waitForTimeout(50044444);
+
         await browser.close();
   }
   main();

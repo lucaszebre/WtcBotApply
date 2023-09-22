@@ -9,6 +9,7 @@
   "author": "lucaszebre",
   "license": "MIT",
   "dependencies": {
-    "dotenv": "^16.3.1"
+    "dotenv": "^16.3.1",
+    "playwright-chromium": "^1.38.1"
   }
 }
