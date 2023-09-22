@@ -91,22 +91,64 @@ async function initiliazer() {
   await page.waitForTimeout(3000);
 }
 
-  async function ApplyToOneCompanies(companies){
-    await page.goto(`https://www.welcometothejungle.com/fr/companies/${companies}/jobs`)
-    const selector = '#pages_organizations_show > main > div > div > section > div.sc-1tceu7y-0.dtBzLT > div > div > div > div > div > div.sc-1mxdn37-1.gkJZtf > ol > div.sc-bXCLTC.eRgxOS > div > button'
-    await buttonClick(selector)
-    const selectorTextArea='#cover_letter'
-    await findTargetAndType(selectorTextArea,letter);
-    const firstInput = '#terms'
-    await buttonClick(firstInput)
-    const secondInput='#consent'
-    await buttonClick(secondInput)
-    const ConfirnButton='#apply-form-submit'
-    await buttonClick(ConfirnButton)
-    await page.waitForTimeout(3000);
+async function ApplyToOneCompanies(companies) {
+    await page.goto(`https://www.welcometothejungle.com/fr/companies/${companies}/jobs`);
+    const selector = '#pages_organizations_show > main > div > div > section > div.sc-1tceu7y-0.dtBzLT > div > div > div > div > div > div.sc-1mxdn37-1.gkJZtf > ol > div.sc-bXCLTC.eRgxOS > div > button';
+    
+        try {
+        await buttonClick(selector);
+        } catch (error) {
+        console.error('Error clicking on button:', error);
+        }
+    
+        const selectorTextArea = '#cover_letter';
+        await findTargetAndType(selectorTextArea, letter);
+    
+        try {
+        await page.evaluate(() => {
+            window.scrollBy(0, window.innerHeight);
+        });
+        } catch (error) {
+        console.error('Error scrolling:', error);
+        }
+    
+        const firstInput = 'input[type="checkbox"][data-testid="apply-form-terms"]#terms';
+        try {
+        await buttonClick(firstInput);
+        } catch (error) {
+        console.error('Error clicking on terms checkbox:', error);
+        }
+    
+        const secondInput = 'input[type="checkbox"][data-testid="apply-form-consent"]#consent';
+        try {
+        await scrollAndClickCheckboxk(secondInput);
+        } catch (error) {
+        console.error('Error clicking on consent checkbox:', error);
+        }
+    
+        const ConfirmButton = '#apply-form-submit';
+        try {
+        await scrollAndClickCheckbox(ConfirmButton);
+        } catch (error) {
+        console.error('Error clicking on submit button:', error);
+        }
+    
+        await page.waitForTimeout(20000);
+    }
+    
+    async function scrollAndClickCheckbox(selector) {
+        await page.waitForSelector(selector);
+        const checkbox = await page.$(selector);
+        if (checkbox) {
+          await page.evaluate((element) => {
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }, checkbox);
+          await checkbox.click();
+        } else {
+          console.error(`Element with selector "${selector}" not found.`);
+        }
+      }
 
-
-  }
 
 
   async function scrapeCompanyNames(companyNameSelector) {
