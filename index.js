@@ -1,3 +1,4 @@
+    const fs = require('fs');
     const { chromium } = require('playwright-chromium');
     const dotenv = require("dotenv");
     dotenv.config(); // Load environment variables from .env file
@@ -14,6 +15,7 @@
     const numberOfPagination = process.env.NUMBER_OF_PAGINATION;
     const nbrOfOffersPerPage = process.env.NUMBER_OF_OFFERS_PER_PAGE;
     let browser = "";
+    let companyApplicationStatus = {}; // Create an empty object to store application status
 
     const letter=`Madame, Monsieur,
 
@@ -50,6 +52,11 @@
 
 
     }
+
+    function updateApplicationStatus(companyName, status) {
+        companyApplicationStatus[companyName] = status;
+      }
+          
 
     async function buttonClickWithTimeout(selector, timeout) {
             try {
@@ -99,7 +106,7 @@
 
     // function to get list of all the company on the page 'i'
     async function GetListCompaniesPage(i) {
-        let Marseille =`https://www.welcometothejungle.com/fr/companies?page=${i}&aroundQuery=Marseille%2C%20France&aroundLatLng=43.29337%2C5.37133&aroundRadius=20000&query=`
+        let Marseille =`https://www.welcometothejungle.com/fr/companies?page=${i}&aroundQuery=Toulouse%2C%20France&aroundLatLng=43.60579%2C1.44864&aroundRadius=20000&query=`
         let Paris=`https://www.welcometothejungle.com/fr/companies?page=${i}&aroundQuery=Paris%2C%20France&aroundLatLng=48.85718%2C2.34141&aroundRadius=20000&query=`
         await page.goto(
         Marseille
@@ -148,12 +155,26 @@
         } catch (error) {
         console.error('Error during application:', error);
         }
-        console.log('apply sucessfully', companies)
+            console.log('Apply successfully to:', companies);
+            updateApplicationStatus(companies, 'Successful');
         } catch (error) {
-            console.log('ErrorApply',companies)
+            console.log('Failed to apply to:', companies);
+            updateApplicationStatus(companies, 'Failed');
         }
         
     }
+
+    function saveApplicationStatusToFile() {
+        const data = JSON.stringify(companyApplicationStatus, null, 2);
+      
+        fs.writeFile('application_status.json', data, (err) => {
+          if (err) {
+            console.error('Error saving application status:', err);
+          } else {
+            console.log('Application status saved to application_status.json');
+          }
+        });
+      }
     
 
     
@@ -179,7 +200,7 @@
         }
     }
     
-    
+
     async function ApplytoAll() {
         await getAllTheCompany();
         // Loop through each company and apply
@@ -193,5 +214,8 @@
             await Login();
             await ApplytoAll()
             await browser.close();
+            process.on('exit', () => {
+                saveApplicationStatusToFile();
+              });
     }
     main();
