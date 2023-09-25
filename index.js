@@ -98,7 +98,7 @@
     // function to get the list of all the company
     async function getAllTheCompany(){
         let i=1
-        while(i<9){
+        while(i<numberOfPagination){
             await GetListCompaniesPage(i)
             i++
         }
@@ -106,10 +106,9 @@
 
     // function to get list of all the company on the page 'i'
     async function GetListCompaniesPage(i) {
-        let Marseille =`https://www.welcometothejungle.com/fr/companies?page=${i}&aroundQuery=Toulouse%2C%20France&aroundLatLng=43.60579%2C1.44864&aroundRadius=20000&query=`
         let Paris=`https://www.welcometothejungle.com/fr/companies?page=${i}&aroundQuery=Paris%2C%20France&aroundLatLng=48.85718%2C2.34141&aroundRadius=20000&query=`
         await page.goto(
-        Marseille
+        Paris
     );
     const selector =
         '#pages_organizations_search > div.sc-bXCLTC.sc-8lzkc1-0.FhrpP > div > div.sc-1ojxmdz-0.iakhCd > label > input';
