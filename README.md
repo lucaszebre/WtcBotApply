@@ -1,3 +1,4 @@
+
 # WtcBotApply
 About to create a bot that aplly for me  so i can finnaly get a intern and stop being a brokie junior -_- 
 
@@ -60,7 +61,6 @@ npm install
 
 Configuration
 
-n
 3. Usage
 Running the Bot
 node index.js
