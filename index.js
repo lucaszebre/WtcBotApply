@@ -49,6 +49,7 @@
         await findTargetAndType('#password', password);
         page.keyboard.press("Enter");
         await page.waitForTimeout(3000); // Wait for 3 seconds (adjust as needed)
+        console.log("work init")
 
 
     }
@@ -76,6 +77,7 @@
     }
 
     async function initiliazer() {
+
         browser = await chromium.launch({
         headless: false,
         executablePath: browserPath,
@@ -83,8 +85,8 @@
         defaultViewport: null,
         });
         page = await browser.newPage();
-    
-        await page.goto(BaseURL);
+        // console.log("work init")
+        // await page.goto(BaseURL);
     }
 
     
